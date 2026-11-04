@@ -1,34 +1,35 @@
-// Force landing page: the intro plays once (not for reduced motion), a replay button afterwards, the copy button.
+// Force landing page: the film plays muted and looped (not with reduced motion), "Sound on" restarts it with sound,
+// and the copy buttons.
 (function () {
-  var video = document.getElementById("intro");
-  var replay = document.querySelector(".replay");
+  var film = document.getElementById("film");
+  var sound = document.querySelector(".sound");
   var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (video && replay) {
-    var show = function () { replay.hidden = false; };
-    video.addEventListener("ended", show);
-    replay.addEventListener("click", function () {
-      replay.hidden = true;
-      video.currentTime = 0;
-      video.play();
-    });
+  if (film) {
     if (still) {
-      replay.textContent = "Play the intro";
-      show();                           // the poster (the wordmark at rest) stays until asked
+      film.controls = true;               // nothing moves until asked
+      if (sound) sound.hidden = true;
     } else {
-      var p = video.play();
-      if (p && p.catch) p.catch(show);  // autoplay refused: offer it
+      var p = film.play();
+      if (p && p.catch) p.catch(function () { film.controls = true; });
     }
+    if (sound) sound.addEventListener("click", function () {
+      var on = film.muted;
+      film.muted = !on;
+      if (on) { film.currentTime = 0; film.play(); }
+      sound.textContent = on ? "Sound off" : "Sound on";
+      sound.setAttribute("aria-pressed", on ? "true" : "false");
+    });
   }
 
   document.querySelectorAll(".copy").forEach(function (btn) {
     btn.addEventListener("click", function () {
       var el = document.getElementById(btn.getAttribute("data-copy"));
       var text = el.textContent.replace(/^\$\s*/, "");
-      var done = function () {
+      if (!navigator.clipboard) return;
+      navigator.clipboard.writeText(text).then(function () {
         btn.textContent = "Copied";
         setTimeout(function () { btn.textContent = "Copy"; }, 1600);
-      };
-      if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () {});
+      }, function () {});
     });
   });
 })();

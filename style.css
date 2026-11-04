@@ -109,6 +109,10 @@ h2 {
 }
 .lede { max-width: 62ch; margin: 0 0 1.6em; }
 
+/* the 21-second film */
+.clip { margin: 0; background: var(--screen); border: 1px solid var(--rule); aspect-ratio: 16 / 9; }
+.clip video { display: block; width: 100%; height: 100%; }
+
 /* the cockpit: real terminal text, 150 columns */
 .term-wrap { overflow-x: auto; background: var(--ground); border: 1px solid var(--rule); }
 .term {
